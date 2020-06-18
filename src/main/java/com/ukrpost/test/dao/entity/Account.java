@@ -19,6 +19,7 @@ public class Account {
 	@OneToOne
 	private User user;
 	private BigDecimal money;
+	private boolean isDeleted;
 	
 	public int getId() {
 		return id;
@@ -44,6 +45,14 @@ public class Account {
 		this.money = money;
 	}
 	
+	public boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -53,8 +62,9 @@ public class Account {
 		builder.append(user);
 		builder.append(", money=");
 		builder.append(money);
+		builder.append(", isDeleted=");
+		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
-	}
-	
+	}	
 }

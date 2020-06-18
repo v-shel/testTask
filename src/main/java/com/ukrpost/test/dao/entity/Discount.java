@@ -19,6 +19,7 @@ public class Discount {
 	@GeneratedValue(strategy = IDENTITY)
 	private Product product;
 	private BigDecimal amount;
+	private boolean isDeleted;
 	
 	public int getId() {
 		return id;
@@ -43,7 +44,15 @@ public class Discount {
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-	
+
+	public boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -53,6 +62,8 @@ public class Discount {
 		builder.append(product);
 		builder.append(", amount=");
 		builder.append(amount);
+		builder.append(", isDeleted=");
+		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
 	}

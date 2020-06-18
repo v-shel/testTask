@@ -14,6 +14,7 @@ public class Product {
 	private int id;
 	private String name;
 	private String description;
+	private boolean isDeleted;
 	
 	public int getId() {
 		return id;
@@ -39,6 +40,14 @@ public class Product {
 		this.description = description;
 	}
 	
+	public boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -48,9 +57,9 @@ public class Product {
 		builder.append(name);
 		builder.append(", description=");
 		builder.append(description);
+		builder.append(", isDeleted=");
+		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
 }

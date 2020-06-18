@@ -5,8 +5,10 @@ import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Entity
+@Entity()
+@Table(name = "user")
 public class User {
 	
 	@Id
@@ -14,6 +16,7 @@ public class User {
 	private int id;
 	private String name;
 	private String email;
+	private boolean isDeleted;
 	
 	public int getId() {
 		return id;
@@ -38,7 +41,15 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
+	public boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -48,6 +59,8 @@ public class User {
 		builder.append(name);
 		builder.append(", email=");
 		builder.append(email);
+		builder.append(", isDeleted=");
+		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
 	}

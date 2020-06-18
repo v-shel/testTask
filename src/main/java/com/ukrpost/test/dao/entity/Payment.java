@@ -21,6 +21,7 @@ public class Payment {
 	List<Integer> products;
 	private BigDecimal amount;
 	private BigDecimal discount;
+	private boolean isDeleted;
 	
 	public int getId() {
 		return id;
@@ -54,6 +55,14 @@ public class Payment {
 		this.discount = discount;
 	}
 	
+	public boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -65,8 +74,9 @@ public class Payment {
 		builder.append(amount);
 		builder.append(", discount=");
 		builder.append(discount);
+		builder.append(", isDeleted=");
+		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
 	}
-	
 }
