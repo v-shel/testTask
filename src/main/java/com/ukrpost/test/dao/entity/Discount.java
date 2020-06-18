@@ -7,17 +7,24 @@ import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Discount {
 	
 	@Id
+	@GeneratedValue(strategy = IDENTITY)
 	private int id;
 	
 	@OneToOne
-	@GeneratedValue(strategy = IDENTITY)
+	@JoinColumn(name = "product_id")
 	private Product product;
+	
+	@NotNull
+	@Min(0)
 	private BigDecimal amount;
 	private boolean isDeleted;
 	

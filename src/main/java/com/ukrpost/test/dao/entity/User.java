@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Entity()
 @Table(name = "user")
@@ -14,7 +15,9 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	private int id;
+	@NotBlank
 	private String name;
+	@NotBlank
 	private String email;
 	private boolean isDeleted;
 	

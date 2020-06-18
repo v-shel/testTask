@@ -1,5 +1,6 @@
 package com.ukrpost.test.dao.entity;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.math.BigDecimal;
@@ -7,7 +8,8 @@ import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Account {
@@ -16,7 +18,8 @@ public class Account {
 	@GeneratedValue(strategy = IDENTITY)
 	private int id;
 	
-	@OneToOne
+	@ManyToOne(fetch = EAGER)
+	@JoinColumn(name = "user_id")
 	private User user;
 	private BigDecimal money;
 	private boolean isDeleted;

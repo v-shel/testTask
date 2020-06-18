@@ -1,7 +1,5 @@
 package com.ukrpost.test.resources;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.ukrpost.test.dao.entity.User;
 import com.ukrpost.test.services.UserService;
@@ -35,11 +32,7 @@ public class UserResource {
 	@GetMapping("/{userId}")
 	@ResponseBody
 	public User userById(@PathVariable("userId") int userId) throws NotFoundException {
-		User user = userService.findById(userId);
-		if (user == null || user.getName().isEmpty()) {
-			throw new ResponseStatusException(NOT_FOUND, "User not found");
-		}
-		return user;
+		return userService.findById(userId);
 	}
 
 	@GetMapping

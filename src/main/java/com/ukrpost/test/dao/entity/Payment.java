@@ -9,6 +9,8 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Payment {
@@ -19,6 +21,9 @@ public class Payment {
 	
 	@ElementCollection
 	List<Integer> products;
+	
+	@NotNull
+	@Min(0)
 	private BigDecimal amount;
 	private BigDecimal discount;
 	private boolean isDeleted;

@@ -1,11 +1,22 @@
 package com.ukrpost.test.dao;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.ukrpost.test.dao.entity.Account;
 
 public interface AccountRepository extends CrudRepository<Account, Integer> {
 	
-	Account findById(Account account);
-	void delete(Account account);
+	@Query("select acc, u from Account acc, User u where acc.isDeleted = false and u.id = :userId")
+	Account findByUserId(@Param("userId") int userId);
+	
+	@Query("select acc, u from Account acc, User u where acc.isDeleted = false and u.id = :userId and u.name = :name")
+	Account findByUserIdAndName(@Param("userId") int userId, @Param("name") String name);
+	
+	@Modifying
+	@Query(value = "update Account acc set acc.is_deleted = true where user_id = :id", nativeQuery = true)
+	void deleteByUserId(@Param("id") int id);
+
 }
