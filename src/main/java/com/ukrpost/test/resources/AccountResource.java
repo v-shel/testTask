@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,6 +30,12 @@ public class AccountResource {
 	
 	@Autowired
 	private AccountService accService;
+	
+	@PostMapping
+	@ResponseBody
+	public Account createAccount(@NotNull @RequestParam("userId") int userId) {
+		return accService.createAccountForUser(userId);
+	}
 	
 	@GetMapping
 	@ResponseBody
@@ -56,9 +63,17 @@ public class AccountResource {
 		return accService.addMoneyToAccount(userId, userName, money);
 	}
 	
+	@PutMapping("/{userId}")
+	@ResponseBody
+	public ResponseEntity<String> disableAccount(@PathVariable("userId") int userId) {
+		accService.disableByUserId(userId);
+		
+		return ResponseEntity.ok("");
+	}
+	
 	@DeleteMapping("/{userId}")
 	@ResponseBody
-	public ResponseEntity<String> deleteAccounts(@PathVariable("userId") int userId) {
+	public ResponseEntity<String> deleteAccount(@PathVariable("userId") int userId) {
 		accService.deleteByUserId(userId);
 		
 		return ResponseEntity.ok("");

@@ -8,5 +8,6 @@
    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
      
     <include file="db/migrations/001_create_tables.sql" />
+    <include file="db/migrations/002_add_is_active_field_into_account.sql" />
      
 </databaseChangeLog>

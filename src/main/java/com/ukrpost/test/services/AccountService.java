@@ -5,14 +5,16 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.math.BigDecimal;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ukrpost.test.dao.AccountRepository;
 import com.ukrpost.test.dao.UserRepository;
 import com.ukrpost.test.dao.entity.Account;
+import com.ukrpost.test.dao.entity.User;
 
 @Service
 public class AccountService {
@@ -27,7 +29,13 @@ public class AccountService {
 		this.userRepo = userRepo;
 	}
 
-	public Account create(Account account) {
+	public Account createAccountForUser(@NotNull int userId) {
+		User user = ofNullable(userRepo.findById(userId))
+				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
+		
+		Account account = new Account();
+		account.setUser(user);
+		account.setMoney(BigDecimal.valueOf(0.0));
 		return accRepo.save(account);
 	}
 	
@@ -56,11 +64,14 @@ public class AccountService {
 		return accRepo.findAll();
 	}
 	
-	@Transactional
+	public void disableByUserId(int userId) {
+		Account acc = findByUserId(userId);
+		acc.setIsActive(false);
+		accRepo.save(acc);
+	}
+	
 	public void deleteByUserId(int userId) {
 		Account acc = findByUserId(userId);
-
 		accRepo.deleteByUserId(acc.getUser().getId());
-		userRepo.deleteById(acc.getUser().getId());
 	}
 }

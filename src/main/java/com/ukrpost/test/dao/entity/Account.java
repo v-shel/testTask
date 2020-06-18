@@ -22,6 +22,7 @@ public class Account {
 	@JoinColumn(name = "user_id")
 	private User user;
 	private BigDecimal money;
+	private boolean isActive;
 	private boolean isDeleted;
 	
 	public int getId() {
@@ -48,6 +49,14 @@ public class Account {
 		this.money = money;
 	}
 	
+	public boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
 	public boolean getIsDeleted() {
 		return isDeleted;
 	}
@@ -65,9 +74,11 @@ public class Account {
 		builder.append(user);
 		builder.append(", money=");
 		builder.append(money);
+		builder.append(", isActive=");
+		builder.append(isActive);
 		builder.append(", isDeleted=");
 		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
-	}	
+	}
 }
