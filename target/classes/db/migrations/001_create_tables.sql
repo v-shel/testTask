@@ -28,7 +28,7 @@ is_deleted boolean default false
 create table discount(
 id serial,
 product_id int not null references product(id),
-amount decimal(3,2) not null,
+amount decimal(5,2) not null,
 is_deleted boolean default false
 );
 
