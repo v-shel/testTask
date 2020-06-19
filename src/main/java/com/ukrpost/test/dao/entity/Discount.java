@@ -20,6 +20,7 @@ public class Discount {
 	@NotNull
 	@Min(0)
 	private BigDecimal amount;
+	private String description;
 	private boolean isDeleted;
 	
 	public int getId() {
@@ -38,6 +39,14 @@ public class Discount {
 		this.amount = amount;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public boolean getIsDeleted() {
 		return isDeleted;
 	}
@@ -53,9 +62,12 @@ public class Discount {
 		builder.append(id);
 		builder.append(", amount=");
 		builder.append(amount);
+		builder.append(", description=");
+		builder.append(description);
 		builder.append(", isDeleted=");
 		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
 	}
+
 }
