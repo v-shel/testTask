@@ -9,5 +9,6 @@
      
     <include file="db/migrations/001_create_tables.sql" />
     <include file="db/migrations/002_add_is_active_field_into_account.sql" />
+    <include file="db/migrations/003_delete_product_from_discount_and_add_discount_to_product.sql" />
      
 </databaseChangeLog>

@@ -5,6 +5,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Product {
@@ -14,6 +16,11 @@ public class Product {
 	private int id;
 	private String name;
 	private String description;
+	
+	@OneToOne
+	@JoinColumn(name = "discount_id")
+	private Discount discount;
+	
 	private boolean isDeleted;
 	
 	public int getId() {
@@ -40,6 +47,14 @@ public class Product {
 		this.description = description;
 	}
 	
+	public Discount getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Discount discount) {
+		this.discount = discount;
+	}
+
 	public boolean getIsDeleted() {
 		return isDeleted;
 	}
@@ -57,9 +72,12 @@ public class Product {
 		builder.append(name);
 		builder.append(", description=");
 		builder.append(description);
+		builder.append(", discount=");
+		builder.append(discount);
 		builder.append(", isDeleted=");
 		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
 	}
+
 }
