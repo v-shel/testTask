@@ -2,6 +2,9 @@ package com.ukrpost.test.dao.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,12 +18,13 @@ public class Product {
 	@GeneratedValue(strategy = IDENTITY)
 	private int id;
 	private String name;
+	private BigDecimal price;
 	private String description;
 	
 	@OneToOne
 	@JoinColumn(name = "discount_id")
 	private Discount discount;
-	
+	private String category;
 	private boolean isDeleted;
 	
 	public int getId() {
@@ -39,6 +43,14 @@ public class Product {
 		this.name = name;
 	}
 	
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -55,6 +67,14 @@ public class Product {
 		this.discount = discount;
 	}
 
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
 	public boolean getIsDeleted() {
 		return isDeleted;
 	}
@@ -62,7 +82,7 @@ public class Product {
 	public void setIsDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -70,14 +90,38 @@ public class Product {
 		builder.append(id);
 		builder.append(", name=");
 		builder.append(name);
+		builder.append(", price=");
+		builder.append(price);
 		builder.append(", description=");
 		builder.append(description);
 		builder.append(", discount=");
 		builder.append(discount);
+		builder.append(", category=");
+		builder.append(category);
 		builder.append(", isDeleted=");
 		builder.append(isDeleted);
 		builder.append("]");
 		return builder.toString();
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, description);
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (this == that) {
+			return true;
+		} 
+		
+		if (!(that instanceof Product)) {
+			return false;
+		}
+		
+		Product other = (Product) that;
+		
+		return Objects.equals(name, other.name)
+				&& Objects.equals(description, other.description);
+	}
 }

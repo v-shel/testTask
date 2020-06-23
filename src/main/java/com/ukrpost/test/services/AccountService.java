@@ -35,6 +35,7 @@ public class AccountService {
 		
 		Account account = new Account();
 		account.setUser(user);
+		account.setIsActive(true);
 		account.setMoney(BigDecimal.valueOf(0.0));
 		return accRepo.save(account);
 	}

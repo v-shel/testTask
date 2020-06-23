@@ -3,6 +3,7 @@ package com.ukrpost.test.dao.entity;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -70,4 +71,23 @@ public class Discount {
 		return builder.toString();
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(amount,  description);
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (this == that) {
+			return true;
+		}
+		
+		if (!(that instanceof Discount)) {
+			return false;
+		}
+		
+		Discount other = (Discount) that;
+		return Objects.equals(amount, other.amount)
+				&& Objects.equals(description, other.description);
+	}
 }
