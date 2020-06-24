@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.ukrpost.test.dao.entity.User;
 import com.ukrpost.test.services.UserService;
 
-import javassist.NotFoundException;
-
 @Controller
 @RequestMapping("/users")
 public class UserResource {
@@ -31,21 +29,13 @@ public class UserResource {
 
 	@GetMapping("/{userId}")
 	@ResponseBody
-	public User userById(@PathVariable("userId") int userId) throws NotFoundException {
+	public User userById(@PathVariable("userId") int userId) {
 		return userService.findById(userId);
-	}
-
-	@GetMapping
-	@ResponseBody
-	public Iterable<User> findAllUsers() {
-		return userService.findAll();
 	}
 	
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<String> delete(@PathVariable("userId") int userId) {
-		
+	public ResponseEntity<String> delete(@PathVariable(name = "userId", required = true) int userId) {
 		userService.delete(userId);
-		
 		return ResponseEntity.ok("");
 	}
 	

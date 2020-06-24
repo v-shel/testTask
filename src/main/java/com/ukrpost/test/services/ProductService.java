@@ -50,8 +50,7 @@ public class ProductService {
 	}
 
 	public Iterable<Product> findByName(String name) {
-		return ofNullable(findByName(name))
-				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, PRODUCT_NOT_FOUND_MSG));
+		return prodRepo.findByName(name);
 	}
 
 	public Iterable<Product> findWithDiscount() {
@@ -67,15 +66,13 @@ public class ProductService {
 		Product prod = ofNullable(findById(productId))
 				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, PRODUCT_NOT_FOUND_MSG));
 
-		if (discount.getAmount().compareTo(ZERO) < 0 || discount.getAmount().compareTo(valueOf(100)) > 0) {
+		if (discount.getPercent().compareTo(ZERO) < 0 || discount.getPercent().compareTo(valueOf(100)) > 0) {
 			throw new ResponseStatusException(BAD_REQUEST, "Incorect discount value");
 		}
 		if (prod.getDiscount() != null && prod.getDiscount().getId() != 0) {
 			discount.setId(prod.getDiscount().getId());
 		}
-
 		prod.setDiscount(discoRepo.save(discount));
-
 		return prodRepo.save(prod);
 	}
 
@@ -88,27 +85,40 @@ public class ProductService {
 		}
 		prodRepo.deleteById(productId);
 	}
-
+	
 	public Payment buyProducts(Collection<Product> products, int userId) {
 		if (products.isEmpty()) {
 			throw new ResponseStatusException(BAD_REQUEST, "Can't checkout without products");
 		}
-
 		// Get available products from DB
-		List<Product> available = prodRepo.findAvailable(products.stream()
+		List<Product> available = prodRepo.findAvailableByListId(products.stream()
 				.map(Product::getId)
 				.collect(toList()));
-
-		if (available.size() < products.size()) { // If available products less than present, throw error with
-													// unavailable products
-			List<Product> unAvailable = products.stream()
-					.filter(p -> !available.contains(p))
-					.collect(toList());
-
-			throw new ResponseStatusException(BAD_REQUEST, "Products not available: " + unAvailable);
-
-		} else {
-			return payService.createAndProcessPayment(available, userId);
+		
+		validProducts(available, (List<Product>) products);
+		
+		Payment payment = payService.createAndProcessPayment((List<Product>) products, userId);
+		
+		if (!payment.getPayStatus().equals("FAILD")) {
+			/*Update products quantities*/
+			products.forEach(p -> {
+				int quantity = available.get(available.indexOf(p)).getQuantity();
+				available.get(available.indexOf(p)).setQuantity(quantity - p.getQuantity());
+			});
+			prodRepo.saveAll(available);
 		}
+		
+		return payment;
+	}
+	
+	private void validProducts(List<Product> available, List<Product> ordered) {
+		/*Checking the availability of the required number of purchased products*/
+		List<Product> failed = ordered.stream()
+			.filter(p -> !available.contains(p) || available.get(available.indexOf(p)).getQuantity() < p.getQuantity())
+			.collect(toList());
+		
+		if (!failed.isEmpty()) { // If available products less than purchase, throw error
+			throw new ResponseStatusException(BAD_REQUEST, "Products not available: " + failed);
+		} 
 	}
 }

@@ -20,7 +20,7 @@ public class Discount {
 	
 	@NotNull
 	@Min(0)
-	private BigDecimal amount;
+	private BigDecimal percent;
 	private String description;
 	private boolean isDeleted;
 	
@@ -32,12 +32,12 @@ public class Discount {
 		this.id = id;
 	}
 	
-	public BigDecimal getAmount() {
-		return amount;
+	public BigDecimal getPercent() {
+		return percent;
 	}
 	
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
+	public void setPercent(BigDecimal percent) {
+		this.percent = percent;
 	}
 
 	public String getDescription() {
@@ -61,8 +61,8 @@ public class Discount {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Discount [id=");
 		builder.append(id);
-		builder.append(", amount=");
-		builder.append(amount);
+		builder.append(", percent=");
+		builder.append(percent);
 		builder.append(", description=");
 		builder.append(description);
 		builder.append(", isDeleted=");
@@ -73,7 +73,7 @@ public class Discount {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(amount,  description);
+		return Objects.hash(percent,  description);
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class Discount {
 		}
 		
 		Discount other = (Discount) that;
-		return Objects.equals(amount, other.amount)
+		return Objects.equals(percent, other.percent)
 				&& Objects.equals(description, other.description);
 	}
 }

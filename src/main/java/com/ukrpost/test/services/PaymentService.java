@@ -1,14 +1,16 @@
 package com.ukrpost.test.services;
 
+import static com.ukrpost.test.enums.PaymentStatus.FAILD;
+import static com.ukrpost.test.enums.PaymentStatus.PAYD;
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toMap;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ukrpost.test.dao.AccountRepository;
@@ -41,13 +44,18 @@ public class PaymentService {
 		this.sellProdRepo = sellProdRepo;
 	}
 
-	public List<Payment> findByAccountId(int userId) {
-		return payRepo.findByAccountId(userId);
+	public List<Payment> findByUserId(int userId) {
+		return payRepo.findByAccountUserId(userId);
 	}
 	
+	public List<Payment> findByPayStatus(String payStatus, int userId) {
+		return payRepo.findByPayStatusAndAccountUserId(payStatus, userId);
+	}
+	
+	@Transactional
 	public Payment createAndProcessPayment(List<Product> products, int userId) {
 		Account account = ofNullable(accRepo.findByUserId(userId))
-				.orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "This user can't by products"));
+				.orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "This user can't by the products"));
 		
 		List<Product> bestDisc = leftOnlyBestDiscount(products, 3); // Delete all discount from products except for 3 best discount.
 		List<SelledProduct> selled = productToSelled(bestDisc);
@@ -56,100 +64,80 @@ public class PaymentService {
 		payment.setAccount(account);
 		payment.setAmountWithoutDiscount(getTotalSumWithoutDiscount(selled));
 		payment.setAmountWithDiscount(getTotalSumWithDiscount(selled));
+		
 		payPayment(payment, account);
-		
-		payment = payRepo.save(payment);
-		int payId = payment.getId();
-		
-		selled.forEach(p -> p.setPaymentId(payId));
-		payment.setProducts((List<SelledProduct>) sellProdRepo.saveAll(selled));
-
+		savePayment(payment, selled);
 		return payment;
 	}
 	
-	private void payPayment(Payment payment, Account account) {
-		if (account.getMoney().compareTo(payment.getAmountWithDiscount()) >= 0) {
-			account.setMoney(account.getMoney().subtract(payment.getAmountWithDiscount()));
-			payment.setCreatedDate(new Date());
-		} else {
-			throw new ResponseStatusException(BAD_REQUEST, "Not enough money to buy this products");
-		}
+	private void savePayment(Payment payment, List<SelledProduct> products) {
+		payment = payRepo.save(payment);
+		int payId = payment.getId();
+		
+		products.forEach(p -> p.setPaymentId(payId));
+		payment.setProducts((List<SelledProduct>) sellProdRepo.saveAll(products));
 	}
 	
 	private BigDecimal getTotalSumWithDiscount(List<SelledProduct> products) {
 		BigDecimal total = ZERO;
-		
 		for (SelledProduct p : products) {
-			
 			if (p.getDiscount() != null && p.getDiscount().compareTo(ZERO) > 0) {
-				total = total.add(decreasePriceByPercent(p.getPrice(), p.getDiscount()));
+				BigDecimal sumByQuantity = p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity()));
+				total = total.add(decreaseValueByPercent(sumByQuantity, p.getDiscount()));
 			} else {
-				total = total.add(p.getPrice());
+				total = total.add(p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity())));
 			}
 		}
 		return total;
 	}
 	
 	private BigDecimal getTotalSumWithoutDiscount(List<SelledProduct> products) {
-		return products.stream() 
-				.map(SelledProduct::getPrice)
+		return products.stream()
+				.map(p -> p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity()))) //Price * quantity
 				.reduce(ZERO, BigDecimal::add)
 				.setScale(2, HALF_EVEN);
 	}
 
 	private List<Product> leftOnlyBestDiscount(List<Product> products, int discountedProducts) {
-		Map<Product, BigDecimal> bestDisc = new HashMap<>();
+		//Find count of best discounts value equals to discountedProducts and have max sum of product quantity
+		Map<Integer, BigDecimal> bestDisc = products.stream()
+			.filter(p -> p.getDiscount() != null && p.getDiscount().getPercent().compareTo(ZERO) > 0)
+			.collect(toMap(Product::getId, this::totalDiscountMoney, BigDecimal::add))
+			.entrySet()
+			.stream()
+			.sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+			.limit(discountedProducts)
+			.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 		
-		products.stream() //Collect product as key and total sum of discount as value of each group of same product
-			.filter(p -> p.getDiscount() != null && p.getDiscount().getAmount().compareTo(ZERO) > 0)
-			.forEach(p -> { 
-				if (bestDisc.containsKey(p)) {
-					bestDisc.get(p).add(percentOfPrice(p.getPrice(), p.getDiscount().getAmount()));
-				} else {
-					BigDecimal sum = percentOfPrice(p.getPrice(), p.getDiscount().getAmount());
-					bestDisc.put(p, sum);
-				}
-			});
-		
-		Map<Product, BigDecimal> filteredDisc = bestDisc.entrySet() 
-				.stream()
-				.sorted((a,b) -> b.getValue().compareTo(a.getValue()))
-				.limit(discountedProducts)
-				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-		
-		for (Entry<Product, BigDecimal> e : filteredDisc.entrySet()) {
-			System.out.println(e.getValue());
-		}
-				
-		if (filteredDisc.isEmpty()) { // If unique products with discount is zero, return all
-			return products;
-
-		} else if (filteredDisc.size() > discountedProducts) { // If unique products more than discountedProducts delete
-			products.stream().forEach(p -> {
-				if (!filteredDisc.containsKey(p)) {
-					p.setDiscount(null);
-				}
-			});
-			return products;
-
-		} else { // If unique products with discount is equals to discountedProducts or less,
-					// return all products
-			return products;
-		}
+		products.stream().filter(p -> !bestDisc.containsKey(p.getId())).forEach( p -> p.setDiscount(null));
+		return products;
 	}
 	
-	private BigDecimal percentOfPrice(BigDecimal price, BigDecimal percent) {
-		return price.divide(BigDecimal.valueOf(100.00)).multiply(percent).setScale(2, HALF_EVEN);
+	private BigDecimal totalDiscountMoney(Product prod) {
+		return prod.getPrice()
+				.multiply(BigDecimal.valueOf(prod.getQuantity()))
+				.divide(BigDecimal.valueOf(100.00))
+				.multiply(prod.getDiscount().getPercent()).setScale(2, HALF_EVEN);
 	}
 	
-	private BigDecimal decreasePriceByPercent(BigDecimal price, BigDecimal percent) {
+	private BigDecimal decreaseValueByPercent(BigDecimal price, BigDecimal percent) {
 		BigDecimal percentValue = price.divide(BigDecimal.valueOf(100.00)).multiply(percent);
 		return price.subtract(percentValue).setScale(2, HALF_EVEN);
+	}
+	
+	private void payPayment(Payment payment, Account account) {
+		if (account.getMoney().compareTo(payment.getAmountWithDiscount()) >= 0) {
+			account.setMoney(account.getMoney().subtract(payment.getAmountWithDiscount()));
+			payment.setPayStatus(PAYD.toString());
+			payment.setCreatedDate(new Date());
+		} else {
+			payment.setPayStatus(FAILD.toString());
+			payment.setCreatedDate(new Date());
+		}
 	}
 
 	private List<SelledProduct> productToSelled(List<Product> products) {
 		List<SelledProduct> selled = new ArrayList<>();
-
 		for (Product pro : products) {
 			selled.add(productToSelled(pro));
 		}
@@ -158,12 +146,11 @@ public class PaymentService {
 
 	private SelledProduct productToSelled(Product product) {
 		SelledProduct selled = new SelledProduct();
-
 		selled.setName(product.getName());
 		selled.setDescription(product.getDescription());
 		selled.setPrice(product.getPrice());
-		selled.setDiscount(ofNullable(product.getDiscount()).map(Discount::getAmount).orElse(ZERO));
-
+		selled.setDiscount(ofNullable(product.getDiscount()).map(Discount::getPercent).orElse(ZERO));
+		selled.setQuantity(product.getQuantity());
 		return selled;
 	}
 }

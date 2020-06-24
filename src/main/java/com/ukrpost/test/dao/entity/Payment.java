@@ -10,8 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,16 +23,18 @@ public class Payment {
 	@GeneratedValue(strategy = IDENTITY)
 	private int id;
 	
-	@ManyToMany
-	@JoinColumn(name = "payment_id")
+	
+	@OneToMany
+	@JoinColumn(name = "paymentId")
 	private List<SelledProduct> products;
 	
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "account_id")
+	@JoinColumn(name = "accountId")
 	private Account account;
 	private BigDecimal amountWithDiscount;
 	private BigDecimal amountWithoutDiscount;
+	private String payStatus;
 	
 	@JsonFormat(pattern = "dd:MM:yyyy hh:mm:ss")
 	private Date createdDate;
@@ -68,6 +70,12 @@ public class Payment {
 	public void setAmountWithoutDiscount(BigDecimal amountWithoutDiscount) {
 		this.amountWithoutDiscount = amountWithoutDiscount;
 	}
+	public String getPayStatus() {
+		return payStatus;
+	}
+	public void setPayStatus(String payStatus) {
+		this.payStatus = payStatus;
+	}
 	public Date getCreatedDate() {
 		return createdDate;
 	}
@@ -80,7 +88,6 @@ public class Payment {
 	public void setIsDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
-	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -94,6 +101,8 @@ public class Payment {
 		builder.append(amountWithDiscount);
 		builder.append(", amountWithoutDiscount=");
 		builder.append(amountWithoutDiscount);
+		builder.append(", payStatus=");
+		builder.append(payStatus);
 		builder.append(", createdDate=");
 		builder.append(createdDate);
 		builder.append(", isDeleted=");

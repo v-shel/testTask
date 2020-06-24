@@ -20,44 +20,65 @@ public class SelledProduct {
 	private String name;
 	private String description;
 	private BigDecimal price;
+	private int quantity;
 	private BigDecimal discount;
 	
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public int getPaymentId() {
 		return paymentId;
 	}
+	
 	public void setPaymentId(int paymentId) {
 		this.paymentId = paymentId;
 	}
+	
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	public String getDescription() {
 		return description;
 	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
 	public BigDecimal getPrice() {
 		return price;
 	}
+	
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
+	
+	public int getQuantity() {
+		return quantity;
+	}
+	
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+	
 	public BigDecimal getDiscount() {
 		return discount;
 	}
+	
 	public void setDiscount(BigDecimal discount) {
 		this.discount = discount;
 	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -71,9 +92,11 @@ public class SelledProduct {
 		builder.append(description);
 		builder.append(", price=");
 		builder.append(price);
+		builder.append(", quantity=");
+		builder.append(quantity);
 		builder.append(", discount=");
 		builder.append(discount);
 		builder.append("]");
 		return builder.toString();
-	}	
+	}
 }

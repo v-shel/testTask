@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Product {
@@ -21,10 +21,11 @@ public class Product {
 	private BigDecimal price;
 	private String description;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "discount_id")
 	private Discount discount;
 	private String category;
+	private int quantity;
 	private boolean isDeleted;
 	
 	public int getId() {
@@ -75,6 +76,14 @@ public class Product {
 		this.category = category;
 	}
 
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
 	public boolean getIsDeleted() {
 		return isDeleted;
 	}
@@ -98,6 +107,8 @@ public class Product {
 		builder.append(discount);
 		builder.append(", category=");
 		builder.append(category);
+		builder.append(", quantity=");
+		builder.append(quantity);
 		builder.append(", isDeleted=");
 		builder.append(isDeleted);
 		builder.append("]");

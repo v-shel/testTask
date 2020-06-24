@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ukrpost.test.dao.UserRepository;
@@ -27,22 +28,16 @@ public class UserService {
 		accService.createAccountForUser(created.getId());
 		return created;
 	}
-	
-	public User update(User user) {
-		return userRepo.save(user);
-	}
-	
-	public User findById(int id) {
-		return ofNullable(userRepo.findById(id))
+
+	public User findById(int userId) {
+		return ofNullable(userRepo.findById(userId))
 				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
 	}
 	
-	public Iterable<User> findAll() {
-		return userRepo.findAll();
-	}
-	
+	@Transactional
 	public void delete(int userId) {
-		User user = findById(userId);
+		User user = ofNullable(userRepo.findById(userId))
+				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
 		accService.deleteByUserId(userId);
 		userRepo.deleteById(user.getId());
 	}

@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ukrpost.test.dao.AccountRepository;
@@ -71,8 +72,8 @@ public class AccountService {
 		accRepo.save(acc);
 	}
 	
+	@Transactional
 	public void deleteByUserId(int userId) {
-		Account acc = findByUserId(userId);
-		accRepo.deleteByUserId(acc.getUser().getId());
+		ofNullable(accRepo.findByUserId(userId)).ifPresent(a -> accRepo.deleteByUserId(a.getId()));
 	}
 }
