@@ -33,13 +33,13 @@ public class AccountResource {
 	
 	@PostMapping
 	@ResponseBody
-	public Account createAccount(@NotNull @RequestParam("userId") int userId) {
+	public Account createAccount(@RequestParam(value = "userId", required = true) int userId) {
 		return accService.createAccountForUser(userId);
 	}
 	
 	@GetMapping
 	@ResponseBody
-	public Account getAccount(@NotNull @RequestParam("userId") int userId,
+	public Account getAccount(@RequestParam(value = "userId", required = true) int userId,
 			@NotNull @RequestParam("userName") String userName) {
 		
 		return accService.findByUserIdAndName(userId, userName);
@@ -53,7 +53,7 @@ public class AccountResource {
 	
 	@PostMapping("/addMoney")
 	@ResponseBody
-	public Account addMoneyToAccount(@NotNull @RequestParam("userId") int userId,
+	public Account addMoneyToAccount(@RequestParam(value = "userId", required = true) int userId,
 			@NotEmpty @RequestParam("userName") String userName,
 			@NotNull @RequestParam("money") BigDecimal money) {
 		

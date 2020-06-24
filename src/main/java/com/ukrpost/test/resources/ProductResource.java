@@ -1,5 +1,7 @@
 package com.ukrpost.test.resources;
 
+import java.util.Collection;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -12,9 +14,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ukrpost.test.dao.entity.Discount;
+import com.ukrpost.test.dao.entity.Payment;
 import com.ukrpost.test.dao.entity.Product;
 import com.ukrpost.test.services.ProductService;
 
@@ -67,5 +71,12 @@ public class ProductResource {
 	public ResponseEntity<String> addDiscount(@PathVariable(name = "prodId", required = true) int prodId) {
 		prodService.deleteById(prodId);
 		return ResponseEntity.ok("");
+	}
+	
+	@PostMapping("/checkout")
+	@ResponseBody
+	public Payment buyProducts(@RequestBody Collection<Product> products,
+			@RequestParam(name = "userId", required = true) int userId) {
+		return prodService.buyProducts(products, userId);
 	}
 }

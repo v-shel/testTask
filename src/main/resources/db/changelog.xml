@@ -8,7 +8,7 @@
    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
      
     <include file="db/migrations/001_create_tables.sql" />
-    <include file="db/migrations/002_add_is_active_field_into_account.sql" />
-    <include file="db/migrations/003_delete_product_from_discount_and_add_discount_to_product.sql" />
-     
+    <include file="db/migrations/002_delete_product_from_discount_and_add_discount_to_product.sql" />
+    <include file="db/migrations/003_created_selled_product_edit_product_tables.sql" />
+    <include file="db/migrations/004_put_test_data.sql" />
 </databaseChangeLog>

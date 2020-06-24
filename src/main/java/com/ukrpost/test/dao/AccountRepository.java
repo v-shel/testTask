@@ -9,12 +9,14 @@ import com.ukrpost.test.dao.entity.Account;
 
 public interface AccountRepository extends CrudRepository<Account, Integer> {
 	
-	@Query("select acc, u from Account acc, User u "
+	@Query("select acc from Account acc "
+			+ "left join User u on u.id = user_id and u.isDeleted = false "
 			+ "where acc.isDeleted = false and acc.isActive = true and u.id = :userId")
 	Account findByUserId(@Param("userId") int userId);
 	
-	@Query("select acc, u from Account acc, User u "
-			+ "where acc.isDeleted = false and acc.isActive = true and u.id = :userId and u.name = :name")
+	@Query("select acc from Account acc "
+			+ "left join User u on u.id = user_id and u.isDeleted = false "
+			+ "where acc.isDeleted = false and acc.isActive = true and u.id = :userId and name = :name")
 	Account findByUserIdAndName(@Param("userId") int userId, @Param("name") String name);
 	
 	@Modifying
